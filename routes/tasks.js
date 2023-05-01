@@ -51,4 +51,40 @@ router.post("/", (req, res) => {
   }
 });
 
+router.patch("/setTaskAsDone/:id", (req, res) => {
+  const id = req.params.id;
+  try {
+    pool.query(
+      "UPDATE tasks SET done=true WHERE id=$1",
+      [id],
+      (error, result) => {
+        if (error) {
+          res.send(error);
+        }
+        res.send(result);
+      }
+    );
+  } catch (error) {
+    res.send(error);
+  }
+});
+
+router.patch("/setTaskAsNotDone/:id", (req, res) => {
+  const id = req.params.id;
+  try {
+    pool.query(
+      "UPDATE tasks SET done=false WHERE id=$1",
+      [id],
+      (error, result) => {
+        if (error) {
+          res.send(error);
+        }
+        res.send(result);
+      }
+    );
+  } catch (error) {
+    res.send(error);
+  }
+});
+
 module.exports = router;
