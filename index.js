@@ -3,7 +3,12 @@ const app = express();
 const tasksRouter = require("./routes/tasks.js");
 const bodyParser = require("body-parser");
 
-app.use(bodyParser);
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Welcome to Todo API");

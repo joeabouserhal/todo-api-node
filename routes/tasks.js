@@ -1,4 +1,5 @@
 const express = require("express");
+const Task = require("../models/task");
 const router = express.Router();
 require("dotenv").config();
 
@@ -28,6 +29,26 @@ router.get("/:id", (req, res) => {
     }
     res.send(result.rows[0]);
   });
+});
+
+router.post("/", (req, res) => {
+  // res.send(req.body);
+  try {
+    Task.parse(req.body);
+    const now = new Date();
+    pool.query(
+      "INSERT INTO tasks (title,description, date_added,done) VALUES ($1,$2,$3,$4)",
+      [req.body.title, req.body.description, now, false],
+      (error, result) => {
+        if (error) {
+          res.send(error);
+        }
+        res.send(result);
+      }
+    );
+  } catch (error) {
+    res.send(error);
+  }
 });
 
 module.exports = router;
