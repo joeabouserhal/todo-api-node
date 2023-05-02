@@ -3,6 +3,8 @@ const Task = require("../models/task");
 const router = express.Router();
 require("dotenv").config();
 
+const authenticateToken = require("../middleware/jwt");
+
 const Pool = require("pg").Pool;
 const pool = new Pool({
   user: process.env.PG_USER,
@@ -12,12 +14,12 @@ const pool = new Pool({
   port: process.env.PG_PORT,
 });
 
-router.get("/", (req, res) => {
+router.get("/", authenticateToken, (req, res) => {
   pool.query("SELECT * FROM tasks", (error, result) => {
     if (error) {
       res.send(error);
     }
-    res.send(result.rows);
+    res.send({ data: result.rows, email: req.user });
   });
 });
 
@@ -51,7 +53,7 @@ router.post("/", (req, res) => {
   }
 });
 
-router.patch("/setTaskAsDone/:id", (req, res) => {
+router.patch("/setAsDone/:id", (req, res) => {
   const id = req.params.id;
   try {
     pool.query(
@@ -69,7 +71,7 @@ router.patch("/setTaskAsDone/:id", (req, res) => {
   }
 });
 
-router.patch("/setTaskAsNotDone/:id", (req, res) => {
+router.patch("/setAsNotDone/:id", (req, res) => {
   const id = req.params.id;
   try {
     pool.query(
@@ -82,6 +84,20 @@ router.patch("/setTaskAsNotDone/:id", (req, res) => {
         res.send(result);
       }
     );
+  } catch (error) {
+    res.send(error);
+  }
+});
+
+router.delete("/delete/:id", (req, res) => {
+  const id = req.params.id;
+  try {
+    pool.query("DELETE FROM tasks WHERE id=$1", [id], (error, result) => {
+      if (error) {
+        res.send(error);
+      }
+      res.send(result);
+    });
   } catch (error) {
     res.send(error);
   }
