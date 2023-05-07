@@ -14,7 +14,7 @@ const pool = new Pool({
   port: process.env.PG_PORT,
 });
 
-router.get("/", authenticateToken, (req, res) => {
+router.get("/", (req, res) => {
   pool.query("SELECT * FROM tasks", (error, result) => {
     if (error) {
       res.send(error);
@@ -39,7 +39,7 @@ router.post("/", (req, res) => {
     Task.parse(req.body);
     const now = new Date();
     pool.query(
-      "INSERT INTO tasks (title,description, date_added,done) VALUES ($1,$2,$3,$4)",
+      "INSERT INTO tasks (title, description, date_created, done) VALUES ($1,$2,$3,$4)",
       [req.body.title, req.body.description, now, false],
       (error, result) => {
         if (error) {
